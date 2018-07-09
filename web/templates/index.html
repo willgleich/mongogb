@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>mongoGuestbook</h1>
+This is a docker project to demonstrate flask and mongodb integration.
+<br>Feel free to register and sign the guestbook, the email to register is not verified.<br>
+{% if not session.get('logged_in') %}
+<p>Do you want to <a href="{{ url_for('login') }}">log in?</a><br>
+    or do you want to <a href="{{ url_for('register') }}">register?</a><br>
+    {% elif session.get('logged_in') %}
+
+    Welcome {{ user }}!!
+    {% endif %}
+
+
+    {% endblock %}

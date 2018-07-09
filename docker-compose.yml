@@ -1,0 +1,22 @@
+web:
+  build: ./web
+  ports:
+   - "5000:5000"
+  volumes:
+   - ./web:/app
+  links:
+   - db
+
+db:
+  image: mongo:latest
+  ports:
+  - "27017:27017"
+
+nginx:
+  image: nginx:latest
+  volumes:
+   - ./nginx:/etc/nginx/conf.d
+  ports:
+  - "80:80"
+  links:
+  - web
