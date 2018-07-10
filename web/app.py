@@ -8,7 +8,7 @@ app = Flask(__name__)
 auth = HTTPBasicAuth()
 app.config['SECRET_KEY'] = os.urandom(24)
 
-#dbconfig
+# dbconfig
 client = pymongo.MongoClient(
     os.environ['DB_PORT_27017_TCP_ADDR'],
     27017)
@@ -18,28 +18,31 @@ db = client.guestbook
 @app.route('/')
 def index():
     if session.get('logged_in'):
-        return render_template('index.html', user = session.get('username'))
+        return render_template('index.html', user=session.get('username'))
     return render_template('index.html')
 
-@app.route('/login', methods=['GET','POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
         return redirect(url_for('index'))
     if request.method == 'POST':
         if not ver_password(request.form['username'], request.form['password']):
-            return render_template('login.html', status = 'IncorrectPassword')
+            return render_template('login.html', status='IncorrectPassword')
         session['logged_in'] = True
         session['username'] = request.form['username']
         return redirect(url_for('create_post'))
     return render_template('login.html')
 
-@app.route('/logout', methods=['GET','POST'])
+
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session['logged_in'] = False
     session['username'] = ''
     return render_template('index.html')
 
-@app.route('/register', methods=['GET','POST'])
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         user_doc = {
@@ -62,12 +65,27 @@ def register():
 
     return render_template('register.html')
 
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        if not ver_password(session['username'], request.form['currentPassword']):
+            return render_template('change_password.html', status='IncorrectPassword')
+        else:
+            db.users.update_one({"_id": session['username']},
+                                {'$set': {"password": generate_password_hash(request.form['newPassword'])}})
+            flash('Password updated')
+
+    return render_template('change_password.html')
+
+
 @app.route('/posts', methods=['GET'])
 def posts():
     _posts = db.posts.find()
     posts = [item for item in _posts]
 
     return render_template('posts.html', posts=reversed(posts))
+
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_post():
@@ -85,15 +103,18 @@ def create_post():
         redirect(url_for('posts'))
     return render_template('create_post.html')
 
+
 def ver_password(username, password):
     user = db.users.find_one({'_id': username})
-    if not user or not check_password_hash(user['password'],  password):
+    if not user or not check_password_hash(user['password'], password):
         return False
     return True
+
 
 @app.route("/getip", methods=["GET"])
 def get_my_ip():
     return jsonify({'ip': request.remote_addr}), 200
+
 
 def time_difference(then):
     '''takes in a datetime object from a previous point in time
@@ -102,14 +123,15 @@ def time_difference(then):
     delt = datetime.datetime.now() - then
     if delt.seconds < 60:
         return str(delt.seconds) + ' seconds ago'
-    elif delt.seconds < 60*60:
-        return str(delt.seconds//60) + ' minutes ago'
-    elif delt.seconds < 60*60*24:
-        return str(delt.seconds//3600) + ' hours ago'
+    elif delt.seconds < 60 * 60:
+        return str(delt.seconds // 60) + ' minutes ago'
+    elif delt.seconds < 60 * 60 * 24:
+        return str(delt.seconds // 3600) + ' hours ago'
     elif delt.days < 365:
         return str(delt.days) + ' days ago'
     else:
         return str(delt.days // 365) + ' years ago'
+
 
 if __name__ == "__main__":
     app.jinja_env.globals.update(time_difference=time_difference)

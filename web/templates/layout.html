@@ -50,6 +50,7 @@
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false">Welcome {{session['username']}}</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown01">
+                    <a class="dropdown-item" href="/change_password">Change Password</a>
                     <!--<a class="dropdown-item" href="/profile">Profile</a>-->
                     <a class="dropdown-item" href="/logout">Logout</a>
                 </div>
@@ -83,15 +84,6 @@
 <script src="/static/bootstrap-4.1.0/dist/js/bootstrap.min.js"></script>
 
 
-<!--{% with messages = get_flashed_messages() %}-->
-<!--{% if messages %}-->
-<!--<ul class=flashes>-->
-<!--{% for message in messages %}-->
-<!--<li>{{ message }}</li>-->
-<!--{% endfor %}-->
-<!--</ul>-->
-<!--{% endif %}-->
-<!--{% endwith %}-->
 
 {% block body %}
 {% endblock %}
