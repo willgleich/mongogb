@@ -13,11 +13,15 @@
         {% for post in posts %}
         <div class="card">
             <div class="card-body mw-60"><strong>{{post['author']}}</strong> wrote: {{post['post']}} <br>
-                <i>{{ time_difference(post['time'])}}</i></div>
+                <i><span title="{{ post['time'].strftime('%m-%d-%y %H:%M:%S') }}">{{ time_difference(post['time'])}}
+                </i></span>
+            </div>
         </div>
-
-        {% endfor %}
     </div>
+</div>
+
+{% endfor %}
+</div>
 </div>
 </body>
 </html>
