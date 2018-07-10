@@ -12,8 +12,8 @@
     <div class="col-6">
         {% for post in posts %}
         <div class="card">
-            <div class="card-body mw-60"><strong>{{post['author']}}</strong> wrote: {{post['post']}} <br><i>30 seconds
-                ago</i></div>
+            <div class="card-body mw-60"><strong>{{post['author']}}</strong> wrote: {{post['post']}} <br>
+                <i>{{ time_difference(post['time'])}}</i></div>
         </div>
 
         {% endfor %}

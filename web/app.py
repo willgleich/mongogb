@@ -27,11 +27,10 @@ def login():
         return redirect(url_for('index'))
     if request.method == 'POST':
         if not ver_password(request.form['username'], request.form['password']):
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
+            return render_template('login.html', status = 'IncorrectPassword')
         session['logged_in'] = True
         session['username'] = request.form['username']
-        return redirect(url_for('index'))
+        return redirect(url_for('create_post'))
     return render_template('login.html')
 
 @app.route('/logout', methods=['GET','POST'])
@@ -57,7 +56,9 @@ def register():
             return render_template('register.html')
         status = 'Registered Successfully'
         flash(status)
-        return render_template('register.html')
+        session['logged_in'] = True
+        session['username'] = request.form['username']
+        return redirect(url_for('create_post'))
 
     return render_template('register.html')
 
@@ -78,11 +79,10 @@ def create_post():
         post_doc = {
             'author': session['username'],
             'post': request.form['comment'],
-            # 'time': datetime.datetime.now()
+            'time': datetime.datetime.now()
         }
         db.posts.insert_one(post_doc)
         redirect(url_for('posts'))
-        #return render_template('posts.html')
     return render_template('create_post.html')
 
 def ver_password(username, password):
@@ -95,5 +95,22 @@ def ver_password(username, password):
 def get_my_ip():
     return jsonify({'ip': request.remote_addr}), 200
 
+def time_difference(then):
+    '''takes in a datetime object from a previous point in time
+    returns mins, seconds, hours, days, years ago
+    TODO: add in later '''
+    delt = datetime.datetime.now() - then
+    if delt.seconds < 60:
+        return str(delt.seconds) + ' seconds ago'
+    elif delt.seconds < 60*60:
+        return str(delt.seconds//60) + ' minutes ago'
+    elif delt.seconds < 60*60*24:
+        return str(delt.seconds//3600) + ' hours ago'
+    elif delt.days < 365:
+        return str(delt.days) + ' days ago'
+    else:
+        return str(delt.days // 365) + ' years ago'
+
 if __name__ == "__main__":
+    app.jinja_env.globals.update(time_difference=time_difference)
     app.run(host='0.0.0.0', debug=True)
