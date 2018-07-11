@@ -84,7 +84,6 @@ def change_password():
 def posts():
     _posts = db.posts.find()
     posts = [item for item in _posts]
-
     return render_template('posts.html', posts=reversed(posts))
 
 
@@ -101,6 +100,11 @@ def create_post():
         db.posts.insert_one(post_doc)
         return redirect(url_for('posts'))
     return render_template('create_post.html')
+
+@app.route('/analytics/top', methods=['GET'])
+def top_analytics():
+    df_html = analytics.top_users_dataframe()
+    return render_template('analytics/top_analytics.html', top_users = df_html)
 
 
 def ver_password(username, password):

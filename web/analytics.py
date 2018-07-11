@@ -8,7 +8,7 @@ client = pymongo.MongoClient(
 db = client.guestbook
 
 
-def populate_mongodb(minutes_ago = 60):
+def populate_mongodb(minutes_ago=60):
     greetings = ['Hello', 'Hi', 'Salutations', 'Greetings']
     verbs = ['really like', 'absolutely adore', 'am OK with', 'enjoy']
     nouns = ['flask', 'pyMongo', 'API', 'upload', 'python script', 'list comprehension']
@@ -17,13 +17,18 @@ def populate_mongodb(minutes_ago = 60):
     db.posts.insert_one({'author': random.choice(users),
                          'post': "{0}, I {1} your {2}.".format(random.choice(greetings), random.choice(verbs),
                                                                random.choice(nouns)),
-                         'time': datetime.datetime.now() - datetime.timedelta(minutes =minutes_ago)})
+                         'time': datetime.datetime.now() - datetime.timedelta(minutes=minutes_ago)})
+
 
 def top_users_dataframe():
     posts = [item for item in db.posts.find()]
     df = pd.DataFrame(posts)
-    return df['author'].value_counts().head().to_frame().transpose().to_html(index=False)
+    return df['author'].value_counts().head().to_frame().transpose().to_html(index=False, escape=False,
+                                                                             classes=['table', 'table-striped',
+                                                                                      'table-dark'])
+
 
 if __name__ == "__main__":
     # for i in range(25,0,-1):
     #     populate_mongodb(minutes_ago=i)
+    pass
