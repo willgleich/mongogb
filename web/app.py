@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, request, render_template, g, jsonify
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 import os, datetime
+import analytics
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -92,15 +93,13 @@ def create_post():
     if not session.get('logged_in'):
         return render_template('unauthorized.html')
     if request.method == 'POST':
-        flash(request.form['comment'])
-        flash('Message Posted Successfully')
         post_doc = {
             'author': session['username'],
             'post': request.form['comment'],
             'time': datetime.datetime.now()
         }
         db.posts.insert_one(post_doc)
-        redirect(url_for('posts'))
+        return redirect(url_for('posts'))
     return render_template('create_post.html')
 
 
@@ -119,7 +118,7 @@ def get_my_ip():
 def time_difference(then):
     '''takes in a datetime object from a previous point in time
     returns mins, seconds, hours, days, years ago
-    TODO: add in later '''
+    TODO: add in later minutes and clean up this code'''
     delt = datetime.datetime.now() - then
     if delt.seconds < 60:
         return str(delt.seconds) + ' seconds ago'
@@ -134,5 +133,7 @@ def time_difference(then):
 
 
 if __name__ == "__main__":
+    for i in range(25,0,-1):
+        analytics.populate_mongodb(minutes_ago=i)
     app.jinja_env.globals.update(time_difference=time_difference)
     app.run(host='0.0.0.0', debug=True)

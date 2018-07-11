@@ -2,3 +2,4 @@ Flask
 pymongo
 flask_httpauth
 gunicorn
+pandas
