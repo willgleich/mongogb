@@ -1,9 +1,16 @@
-import os, pymongo
+import pymongo
 from flask import Flask, redirect, url_for, request, render_template, g, jsonify, flash, session
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 import os, datetime
 import analytics
+from io import BytesIO
+import base64
+import matplotlib
+import urllib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -104,7 +111,12 @@ def create_post():
 @app.route('/analytics/top', methods=['GET'])
 def top_analytics():
     df_html = analytics.top_users_dataframe()
-    return render_template('analytics/top_analytics.html', top_users = df_html)
+    img = BytesIO()
+    df_graph = analytics.top_users_graph()
+    matplotlib.pyplot.savefig(img, format='png')
+    img.seek(0)
+    plot_url = urllib.parse.quote(base64.b64encode(img.read()).decode())
+    return render_template('analytics/top_analytics.html', top_users = df_html, plot_url=plot_url)
 
 
 def ver_password(username, password):
@@ -117,6 +129,8 @@ def ver_password(username, password):
 @app.route("/getip", methods=["GET"])
 def get_my_ip():
     return jsonify({'ip': request.remote_addr}), 200
+
+
 
 
 def time_difference(then):

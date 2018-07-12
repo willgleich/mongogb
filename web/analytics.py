@@ -27,6 +27,11 @@ def top_users_dataframe():
                                                                              classes=['table', 'table-striped',
                                                                                       'table-dark'])
 
+def top_users_graph():
+    posts = [item for item in db.posts.find()]
+    df = pd.DataFrame(posts)
+    graph = df['author'].value_counts().head().plot(kind='bar', title='Counts per User', rot=0)
+    return graph
 
 if __name__ == "__main__":
     # for i in range(25,0,-1):

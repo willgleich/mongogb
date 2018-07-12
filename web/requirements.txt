@@ -3,3 +3,5 @@ pymongo
 flask_httpauth
 gunicorn
 pandas
+seaborn
+matplotlib
